@@ -32,6 +32,10 @@ describe('HTTPServer', async () => {
             email: chance.email({ domain: 'totvs.com.br' }),
             password: chance.string({ length: 6 })
         };
+        context.userUser3 = {
+            email: chance.email({ domain: 'totvs.com.br' }),
+            password: chance.string({ length: 6 })
+        };
         context.userAdmin1 = {
             email: 'conrado.gomes@totvs.com.br',
             password: '123456'
@@ -73,6 +77,13 @@ describe('HTTPServer', async () => {
             .expect(200);
     });
 
+    step('create user 3', async () => {
+        return await supertest(context.server1.app)
+            .post('/users')
+            .send(context.userUser3)
+            .expect(200);
+    });
+
     step('create user admin 1', async () => {
         return await supertest(context.server1.app)
             .post('/users')
@@ -103,12 +114,51 @@ describe('HTTPServer', async () => {
         context.tokenUserUser2 = tokenResponse.body.token;
     });
 
+    step('get token for user 3', async () => {
+        const tokenResponse = await supertest(context.server1.app)
+            .post('/token')
+            .send(context.userUser3)
+            .expect(200);
+        context.tokenUserUser3 = tokenResponse.body.token;
+    });
+
+    step('change user 3 password', async () => {
+        const newPassword = chance.string({ length: 6 });
+        await supertest(context.server1.app)
+            .put(`/users/${context.userUser3.email}`)
+            .set({ Authorization: context.tokenUserUser3 })
+            .send({
+                password: newPassword
+            })
+            .expect(200);
+
+        context.userUser3.password = newPassword;
+    });
+
+    step('get token for user 3 with the new password', async () => {
+        const tokenResponse = await supertest(context.server1.app)
+            .post('/token')
+            .send(context.userUser3)
+            .expect(200);
+        context.tokenUserUser3 = tokenResponse.body.token;
+    });
+
     step('get token for user admin 1', async () => {
         const tokenResponse = await supertest(context.server1.app)
             .post('/token')
             .send(context.userAdmin1)
             .expect(200);
         context.tokenUserAdmin1 = tokenResponse.body.token;
+    });
+
+    step('change user 3 type to admin using admin user', async () => {        
+        await supertest(context.server1.app)
+            .put(`/users/${context.userUser3.email}`)
+            .set({ Authorization: context.tokenUserAdmin1 })
+            .send({
+                type: 'admin'
+            })
+            .expect(200);
     });
 
     step('get stacks of user 1', async () => {
