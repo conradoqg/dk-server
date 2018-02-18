@@ -4,8 +4,8 @@
   "description": "Donkey Kong Sandobox Provisioning Service Server",
   "main": "lib//index.js",
   "scripts": {
-    "coverage": "nyc --reporter=lcov --reporter=text --clean node node_modules/mocha/bin/_mocha -u bdd --recursive --colors test/",
-    "test": "_mocha -u bdd --recursive --colors test/"
+    "coverage": "cross-env ENV=development nyc --reporter=lcov --reporter=text --clean node node_modules/mocha/bin/_mocha -u bdd --recursive --colors test/",
+    "test": "cross-env ENV=development mocha -u bdd --recursive --colors test/"
   },
   "author": "",
   "license": "MIT",
@@ -19,6 +19,7 @@
     "goby": "^1.1.2",
     "js-yaml": "^3.10.0",
     "jsonwebtoken": "^8.1.1",
+    "password-sheriff": "^1.1.0",
     "pouchdb": "^6.4.3",
     "pug": "^2.0.0-rc.4",
     "slugify": "^1.2.9",
@@ -30,6 +31,7 @@
     "chai": "^4.1.2",
     "chai-as-promised": "^7.1.1",
     "chance": "^1.0.13",
+    "cross-env": "^5.1.3",
     "mocha": "^5.0.1",
     "mocha-steps": "git+https://github.com/rprieto/mocha-steps.git",
     "nyc": "^11.4.1",

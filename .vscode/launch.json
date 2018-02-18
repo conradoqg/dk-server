@@ -8,7 +8,10 @@
             "type": "node",
             "request": "launch",
             "name": "Launch Program",
-            "program": "${workspaceFolder}\\lib\\index.js"
+            "program": "${workspaceFolder}\\lib\\index.js",
+            "env": {
+                "ENV": "development"
+            }
         },
         {
             "type": "node",
