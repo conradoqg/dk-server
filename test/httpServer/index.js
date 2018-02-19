@@ -48,7 +48,7 @@ describe('HTTPServer', async () => {
 
 services:
     main:
-        image: vfarcic/go-demo\$\{TAG\}
+        image: vfarcic/go-demo\${TAG}
         environment:
         - DB=db
         networks:
