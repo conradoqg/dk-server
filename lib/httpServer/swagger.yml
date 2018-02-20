@@ -1,0 +1,478 @@
+swagger: "2.0"
+info:
+  title: DK API
+  description: |
+    <h2>Authentication</h2><br>
+    <ul>
+      <li>Create an user: POST to /users</li>
+      <li>Create a token using the previously created user: POST to /token</li>
+    </ul><br>
+    <h2>Rate Limit</h2><br>
+    The resources have a limited amount of requests as following:
+    <ul>
+      <li> All endpoints: 15 minutes window for 100 requests </li>
+      <li> User creation: 1 day window for 2 requests </li>
+    </ul>
+  version: 1.0.0
+
+basePath: /
+schemes:
+  - http
+  - https
+consumes:
+  - application/json
+produces:
+  - application/json
+securityDefinitions:   
+   JWTAuthorization:
+     type: apiKey
+     in: header
+     name: Authorization
+
+paths:
+  /ping:
+    get:
+      tags:
+        - general    
+      summary: Get ping response
+      description: Check if the API is responding to requests.
+      responses:
+        200:
+          description: OK
+          schema:
+            type: string
+  /healthcheck:
+    get:
+      tags:
+        - general    
+      summary: Get healthcheck information
+      description: Check if the API is healthy, meaning that it can talk to database and docker.
+      responses:
+        200:
+          description: OK
+          schema:
+            type: object
+            properties:
+              healthy:
+                type: boolean
+  /stacks:
+    get:
+      tags:
+        - stacks
+      summary: Get stacks
+      description: All running stacks are returned
+      security:
+        - JWTAuthorization: []
+      responses:
+        200:
+          description: OK
+          schema:
+            type: array
+            items:
+              $ref: "#/definitions/Stack"
+        401:          
+          $ref: "#/responses/Unauthorized"
+    post:
+      tags:
+        - stacks
+      summary: Create a stack
+      description: Create a stack using a stack template name
+      parameters:
+        -
+          in: body
+          name: body
+          description: Stack creation request
+          required: true,
+          schema:
+            type: object
+            required:
+              - stackTemplateName
+            properties:
+              stackTemplateName: 
+                type: string
+              stackName:
+                type: string
+      responses:
+        200:
+          description: OK
+          schema:
+            type: object
+            properties:
+              stackName:
+                type: string
+        401:          
+          $ref: "#/responses/Unauthorized"
+        400:
+          description: BadRequest - Stack template not found or max stacks for user reached
+          schema:
+            $ref: "#/definitions/Error"        
+  /stacks/{stackName}:
+    get:
+      tags:
+        - stacks
+      summary: Get a stack
+      description: Get a stack by name
+      parameters:
+        -
+          in: path
+          name: stackName
+          description: Stack name
+          required: true,
+          type: string
+      responses:
+        200:
+          description: OK
+          schema:
+            $ref: "#/definitions/Stack"
+        404:
+          description: Not Found - Stack not found for user
+          schema:
+            $ref: "#/definitions/Error"
+        401:          
+          $ref: "#/responses/Unauthorized"
+        400:
+          description: Bad Request - The stackName parameter must be a string
+          schema:
+            $ref: "#/definitions/Error"
+    delete:
+      tags:
+        - stacks
+      summary: Delete a stack
+      description: Delete a stack by name
+      parameters:
+        -
+          in: path
+          name: stackName
+          description: Stack name
+          required: true,
+          type: string
+      responses:
+        200:
+          description: OK
+          schema:
+            type: object
+            properties:
+              success:
+                type: boolean            
+        404:
+          description: Not Found - Stack not found for user
+          schema:
+            $ref: "#/definitions/Error"
+        401:          
+          $ref: "#/responses/Unauthorized"
+        400:
+          description: Bad Request - The stackName parameter must be a string
+          schema:
+            $ref: "#/definitions/Error"        
+  /templates/stacks:
+    get:
+      tags:
+        - stack templates
+      summary: Get stack templates
+      description: All existing stack templates are returned
+      responses:
+        200:
+          description: OK
+          schema:
+            type: array
+            items:
+              $ref: "#/definitions/StackTemplate"
+        401:          
+          $ref: "#/responses/Unauthorized"
+    post:
+      tags:
+        - stack templates
+      summary: Create a stack template
+      description: Create a stack template from a yaml file      
+      parameters:
+        -
+          in: body
+          name: body
+          description: Stack template creation request
+          required: true,
+          schema:
+            $ref: "#/definitions/StackTemplate"
+      responses:
+        200:
+          description: OK
+          schema:
+            $ref: "#/definitions/StackTemplate"
+        403:
+          description: Forbidden - The user is not authorized to do this operation
+          schema:
+            $ref: "#/definitions/Error" 
+        401:          
+          $ref: "#/responses/Unauthorized"
+        400:
+          description: BadRequest - Template already exist
+          schema:
+            $ref: "#/definitions/Error" 
+    put:
+      tags:
+        - stack templates
+      summary: Update a stack template
+      description: Update a stack template from a yaml file using the stack template name
+      parameters:
+        -
+          in: body
+          name: body
+          description: Stack template update request
+          required: true,
+          schema:
+            $ref: "#/definitions/StackTemplate"
+      responses:
+        200:
+          description: OK
+          schema:
+            $ref: "#/definitions/StackTemplate"
+        403:
+          description: Forbidden - The user is not authorized to do this operation
+          schema:
+            $ref: "#/definitions/Error" 
+        401:          
+          $ref: "#/responses/Unauthorized"
+        400:
+          description: BadRequest - Template already exist
+          schema:
+            $ref: "#/definitions/Error" 
+  /templates/stacks/{stackTemplateName}:
+    get:
+      tags:
+        - stack templates
+      summary: Get a stack template
+      description: Get a stack template by name
+      parameters:
+        -
+          in: path
+          name: stackTemplateName
+          description: Stack template name
+          required: true,
+          type: string
+      responses:
+        200:
+          description: OK
+          schema:
+            $ref: "#/definitions/StackTemplate"
+        404:
+          description: Not Found - Stack template not found
+          schema:
+            $ref: "#/definitions/Error"
+        403:
+          description: Forbidden - The user is not authorized to do this operation
+          schema:
+            $ref: "#/definitions/Error" 
+        401:          
+          $ref: "#/responses/Unauthorized"
+        400:
+          description: Bad Request - The stackTemplateName parameter must be a string
+          schema:
+            $ref: "#/definitions/Error"
+    delete:
+      tags:
+        - stack templates
+      summary: Delete a stack template
+      description: Delete a stack template by name
+      parameters:
+        -
+          in: path
+          name: stackTemplateName
+          description: Stack template name
+          required: true,
+          type: string
+      responses:
+        200:
+          description: OK
+          schema:
+            $ref: "#/definitions/StackTemplate"
+        404:
+          description: Not Found - Stack template not found
+          schema:
+            $ref: "#/definitions/Error"
+        403:
+          description: Forbidden - The user is not authorized to do this operation
+          schema:
+            $ref: "#/definitions/Error" 
+        401:          
+          $ref: "#/responses/Unauthorized"
+        400:
+          description: Bad Request - The stackTemplateName parameter must be a string
+          schema:
+            $ref: "#/definitions/Error"
+  /users:
+    post:
+      tags:
+        - users
+      summary: Create a user
+      description: Create a user
+      parameters:
+        -
+          in: body
+          name: body
+          description: User creation request
+          required: true,
+          schema:
+            $ref: "#/definitions/User"
+      responses:
+        200:
+          description: OK
+          schema:
+            type: object
+            properties:
+              success:
+                type: string                
+        400:
+          description: BadRequest - The parameter email and/or password must be a string or the password doesn't meet policy criteria or the user already exists
+          schema:
+            $ref: "#/definitions/Error" 
+    put:
+      tags:
+        - users
+      summary: Update a user
+      description: Update a user password or type
+      parameters:
+        -
+          in: body
+          name: body
+          description: User update request
+          required: true,
+          schema:
+            $ref: "#/definitions/User"
+      responses:
+        200:
+          description: OK
+          schema:
+            type: object
+            properties:
+              success:
+                type: string                
+        403:
+          description: Forbidden - The user is not authorized to update user
+          schema:
+            $ref: "#/definitions/Error" 
+        401:          
+          $ref: "#/responses/Unauthorized"
+        400:
+          description: BadRequest - The parameter email must be a string or the password doesn't meet policy criteria or the user doesn't exist
+          schema:
+            $ref: "#/definitions/Error"
+  /token:
+    post:
+      tags:
+        - tokens
+      summary: Create a token
+      description: Create a token using email and password
+      parameters:
+        -
+          in: body
+          name: body
+          description: Token creation request
+          required: true,
+          schema:
+            type: object
+            required:
+              - email
+              - password
+            properties:
+              email:
+                type: string
+              password:
+                type: string
+      responses:
+        200:
+          description: OK
+          schema:
+            type: object
+            properties:
+              token:
+                type: string  
+        401:
+          $ref: "#/responses/Unauthorized"              
+        400:
+          description: BadRequest - The parameter email and/or password must be a string or invalid username and/or password
+          schema:
+            $ref: "#/definitions/Error" 
+
+responses:
+  Unauthorized:
+    description: Unauthorized - Authorization header missing or failed to authenticate token
+    schema:
+      $ref: "#/definitions/Error"  
+
+definitions:
+  Stack:
+    type: object
+    properties:
+      name: 
+        type: string
+      services: 
+        type: array
+        items: 
+          $ref: "#/definitions/Service"
+  Service:
+    type: object
+    properties:
+      id:
+        type: string
+      createdAt:
+        type: string
+      name:
+        type: string
+      image: 
+        type: string
+      email: 
+        type: string
+      ports:
+        type: array
+        items:
+          type: integer
+      tasks:
+        type: array
+        items:
+          $ref: "#/definitions/Task"
+  Task:
+    type: object
+    properties:
+      createdAt:
+        type: string
+      state:
+        type: string
+      node:
+        $ref: "#/definitions/Node"
+  Node:
+    type: object
+    properties:
+      state:
+        type: string
+      addr:
+        type: string
+  StackTemplate:
+    type: object
+    required:
+      - name
+      - data
+    properties:
+      name:
+        type: string
+      data:
+        type: string
+  User:
+    type: object
+    required:
+      - email
+      - password
+    properties:
+      email:
+        type: string
+      password:
+        type: string
+      type:
+        type: string
+  Error:
+    type: object
+    properties:
+      status:
+        type: integer
+      message:
+        type: string
+
+

@@ -237,7 +237,7 @@ networks:
             const stackCreationResult = await supertest(context.server1.app)
                 .post('/stacks')
                 .set({ Authorization: context.tokenUserUser1 })
-                .send({ composeTemplateName: 'docker-stack-sample1' })
+                .send({ stackTemplateName: 'docker-stack-sample1' })
                 .expect(200);
             stackCreationResult.should.not.be.empty;
             stackCreationResult.body.should.not.be.empty;
@@ -255,7 +255,7 @@ networks:
             const stackCreationResult = await supertest(context.server1.app)
                 .post('/stacks')
                 .set({ Authorization: context.tokenUserUser1 })
-                .send({ composeTemplateName: 'docker-stack-sample1' })
+                .send({ stackTemplateName: 'docker-stack-sample1' })
                 .expect(200);
             stackCreationResult.should.not.be.empty;
             stackCreationResult.body.should.not.be.empty;
@@ -272,7 +272,7 @@ networks:
         await supertest(context.server1.app)
             .post('/stacks')
             .set({ Authorization: context.tokenUserUser1 })
-            .send({ composeTemplateName: 'docker-stack-sample1' })
+            .send({ stackTemplateName: 'docker-stack-sample1' })
             .expect(400);
     }).timeout(999999);
 

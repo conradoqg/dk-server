@@ -25,7 +25,7 @@
     "pug": "^2.0.0-rc.4",
     "slugify": "^1.2.9",
     "statuses": "^1.4.0",
-    "swagger-ui-express": "^2.0.15",
+    "swagger-ui-express": "^1.0.8",
     "tempy": "^0.2.1"
   },
   "devDependencies": {
