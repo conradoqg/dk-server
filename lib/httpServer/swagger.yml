@@ -24,10 +24,10 @@ consumes:
 produces:
   - application/json
 securityDefinitions:   
-   JWTAuthorization:
-     type: apiKey
-     in: header
-     name: Authorization
+    JWTAuthorization:
+      type: apiKey
+      in: header
+      name: Authorization
 
 paths:
   /ping:
@@ -299,6 +299,22 @@ paths:
           schema:
             $ref: "#/definitions/Error"
   /users:
+    get:
+      tags:
+        - users
+      summary: Get users
+      description: Get all users
+      responses:
+        200:
+            description: OK
+            schema:
+              type: array
+              items:
+                $ref: "#/definitions/UserResponse"
+        403:
+            description: Forbidden - The user is not authorized to list users
+            schema:
+              $ref: "#/definitions/Error" 
     post:
       tags:
         - users
@@ -316,10 +332,7 @@ paths:
         200:
           description: OK
           schema:
-            type: object
-            properties:
-              success:
-                type: string                
+            $ref: "#/definitions/UserResponse"
         400:
           description: BadRequest - The parameter email and/or password must be a string or the password doesn't meet policy criteria or the user already exists
           schema:
@@ -341,10 +354,7 @@ paths:
         200:
           description: OK
           schema:
-            type: object
-            properties:
-              success:
-                type: string                
+            $ref: "#/definitions/UserResponse"
         403:
           description: Forbidden - The user is not authorized to update user
           schema:
@@ -457,9 +467,6 @@ definitions:
         type: string
   User:
     type: object
-    required:
-      - email
-      - password
     properties:
       email:
         type: string
@@ -467,6 +474,20 @@ definitions:
         type: string
       type:
         type: string
+    required:
+      - email
+      - password
+      - type
+  UserResponse:
+    type: object
+    properties:
+      email:
+        type: string
+      type:
+        type: string
+    required:
+      - email
+      - type
   Error:
     type: object
     properties:
