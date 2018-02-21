@@ -5,8 +5,8 @@
   "main": "lib//dk-server.js",
   "scripts": {
     "start": "cross-env NODE_ENV=production node bin//dk-server.js",
-    "coverage": "cross-env NODE_ENV=development LOG_LEVEL=0 nyc --reporter=lcov --reporter=text --clean node node_modules/mocha/bin/_mocha -u bdd --recursive --colors test/",
-    "test": "cross-env NODE_ENV=development LOG_LEVEL=0 mocha -u bdd --recursive --colors test/"
+    "coverage": "cross-env NODE_ENV=development LOG_LEVEL=0 nyc --reporter=lcov --reporter=text --clean node node_modules/mocha/bin/_mocha -u bdd --recursive --timeout 60000 --colors test/",
+    "test": "cross-env NODE_ENV=development LOG_LEVEL=0 mocha -u bdd --recursive --timeout 60000 --colors test/"
   },
   "author": "",
   "license": "MIT",

@@ -77,6 +77,8 @@ paths:
         - stacks
       summary: Create a stack
       description: Create a stack using a stack template name
+      security:
+        - JWTAuthorization: []
       parameters:
         -
           in: body
@@ -112,6 +114,8 @@ paths:
         - stacks
       summary: Get a stack
       description: Get a stack by name
+      security:
+        - JWTAuthorization: []
       parameters:
         -
           in: path
@@ -139,6 +143,8 @@ paths:
         - stacks
       summary: Delete a stack
       description: Delete a stack by name
+      security:
+        - JWTAuthorization: []
       parameters:
         -
           in: path
@@ -170,6 +176,8 @@ paths:
         - stack templates
       summary: Get stack templates
       description: All existing stack templates are returned
+      security:
+        - JWTAuthorization: []
       responses:
         200:
           description: OK
@@ -183,7 +191,9 @@ paths:
       tags:
         - stack templates
       summary: Create a stack template
-      description: Create a stack template from a yaml file      
+      description: Create a stack template from a yaml file  
+      security:
+        - JWTAuthorization: []    
       parameters:
         -
           in: body
@@ -212,6 +222,8 @@ paths:
         - stack templates
       summary: Update a stack template
       description: Update a stack template from a yaml file using the stack template name
+      security:
+        - JWTAuthorization: []
       parameters:
         -
           in: body
@@ -241,6 +253,8 @@ paths:
         - stack templates
       summary: Get a stack template
       description: Get a stack template by name
+      security:
+        - JWTAuthorization: []
       parameters:
         -
           in: path
@@ -272,6 +286,8 @@ paths:
         - stack templates
       summary: Delete a stack template
       description: Delete a stack template by name
+      security:
+        - JWTAuthorization: []
       parameters:
         -
           in: path
@@ -304,6 +320,8 @@ paths:
         - users
       summary: Get users
       description: Get all users
+      security:
+        - JWTAuthorization: []
       responses:
         200:
             description: OK
@@ -320,6 +338,8 @@ paths:
         - users
       summary: Create a user
       description: Create a user
+      security:
+        - JWTAuthorization: []
       parameters:
         -
           in: body
@@ -342,6 +362,8 @@ paths:
         - users
       summary: Update a user
       description: Update a user password or type
+      security:
+        - JWTAuthorization: []
       parameters:
         -
           in: body

@@ -9,8 +9,6 @@ const DB = require('../../lib/db');
 const Auth = require('../../lib/auth');
 
 const chance = new Chance();
-
-
 const timeout = ms => new Promise(res => setTimeout(res, ms));
 
 describe('HTTPServer', async () => {
@@ -18,11 +16,14 @@ describe('HTTPServer', async () => {
 
     before(async () => {
         const dockerService = new Docker();
-        context.dbService = new DB();
-        const authService = new Auth(context.dbService);
-        const stackTemplateService = new StackTemplate(context.dbService);
+        const dbService = new DB();        
+        const authService = new Auth(dbService);
+        const stackTemplateService = new StackTemplate(dbService);
         const server = new HTTPServer(dockerService, authService, stackTemplateService);
+
         context.server1 = server;
+        context.dbService = dbService;
+        context.initialToken = await authService.getFirstTimeToken();
         context.userInvalid = {
             email: chance.email({ domain: 'totvs.com.br' }),
             password: chance.string({ length: 5 })
@@ -40,11 +41,12 @@ describe('HTTPServer', async () => {
             password: chance.string({ length: 6 })
         };
         context.userAdmin1 = {
-            email: 'conrado.gomes@totvs.com.br',
-            password: '123456'
+            email: chance.email({ domain: 'totvs.com.br' }),
+            password: chance.string({ length: 6 }),
+            type: 'admin'
         };
         context.sampleStackTemplate =
-`version: '3'
+            `version: '3'
 
 services:
     main:
@@ -180,6 +182,7 @@ networks:
     step('get token for user admin 1', async () => {
         const tokenResponse = await supertest(context.server1.app)
             .post('/token')
+            .set({ Authorization: context.initialToken })
             .send(context.userAdmin1)
             .expect(200);
         context.tokenUserAdmin1 = tokenResponse.body.token;
@@ -232,41 +235,31 @@ networks:
         stackTemplates.body.should.be.a('object').that.has.property('data', context.sampleStackTemplate);
     });
 
-    step('create stack 1 for user 1', async (done) => {
-        try {
-            const stackCreationResult = await supertest(context.server1.app)
-                .post('/stacks')
-                .set({ Authorization: context.tokenUserUser1 })
-                .send({ stackTemplateName: 'docker-stack-sample1' })
-                .expect(200);
-            stackCreationResult.should.not.be.empty;
-            stackCreationResult.body.should.not.be.empty;
-            stackCreationResult.body.should.have.property('stackName');
-            context.stack1 = stackCreationResult.body.stackName;
-            await timeout(5000);
-            done();
-        } catch (ex) {
-            done(ex);
-        }
-    }).timeout(999999);
+    step('create stack 1 for user 1', async () => {
+        const stackCreationResult = await supertest(context.server1.app)
+            .post('/stacks')
+            .set({ Authorization: context.tokenUserUser1 })
+            .send({ stackTemplateName: 'docker-stack-sample1' })
+            .expect(200);
+        await timeout(5000);
+        stackCreationResult.should.not.be.empty;
+        stackCreationResult.body.should.not.be.empty;
+        stackCreationResult.body.should.have.property('stackName');
+        context.stack1 = stackCreationResult.body.stackName;
+    });
 
-    step('create stack 2 for user 1', async (done) => {
-        try {
-            const stackCreationResult = await supertest(context.server1.app)
-                .post('/stacks')
-                .set({ Authorization: context.tokenUserUser1 })
-                .send({ stackTemplateName: 'docker-stack-sample1' })
-                .expect(200);
-            stackCreationResult.should.not.be.empty;
-            stackCreationResult.body.should.not.be.empty;
-            stackCreationResult.body.should.have.property('stackName');
-            context.stack2 = stackCreationResult.body.stackName;
-            await timeout(5000);
-            done();
-        } catch (ex) {
-            done(ex);
-        }
-    }).timeout(999999);
+    step('create stack 2 for user 1', async () => {
+        const stackCreationResult = await supertest(context.server1.app)
+            .post('/stacks')
+            .set({ Authorization: context.tokenUserUser1 })
+            .send({ stackTemplateName: 'docker-stack-sample1' })
+            .expect(200);
+        await timeout(5000);
+        stackCreationResult.should.not.be.empty;
+        stackCreationResult.body.should.not.be.empty;
+        stackCreationResult.body.should.have.property('stackName');
+        context.stack2 = stackCreationResult.body.stackName;
+    });
 
     step('create stack 3 for user 1 (should not create)', async () => {
         await supertest(context.server1.app)
@@ -274,7 +267,7 @@ networks:
             .set({ Authorization: context.tokenUserUser1 })
             .send({ stackTemplateName: 'docker-stack-sample1' })
             .expect(400);
-    }).timeout(999999);
+    });
 
     step('get the created stack 1 of user 1', async () => {
         const stackResult = await supertest(context.server1.app)
