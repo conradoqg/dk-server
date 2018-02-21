@@ -8,9 +8,9 @@
             "type": "node",
             "request": "launch",
             "name": "Launch Program",
-            "program": "${workspaceFolder}\\lib\\index.js",
+            "program": "${workspaceFolder}\\bin\\dk-server.js",
             "env": {
-                "ENV": "development"
+                "NODE_ENV": "development"
             }
         },
         {
@@ -28,7 +28,7 @@
                 "${file}"
             ],
             "env": {
-                "ENV": "development"
+                "NODE_ENV": "development"
             },
             "internalConsoleOptions": "openOnSessionStart",
             "skipFiles": [

@@ -2,16 +2,19 @@
   "name": "dk-server",
   "version": "1.0.0",
   "description": "Donkey Kong Sandobox Provisioning Service Server",
-  "main": "lib//index.js",
+  "main": "lib//dk-server.js",
   "scripts": {
-    "coverage": "cross-env ENV=development nyc --reporter=lcov --reporter=text --clean node node_modules/mocha/bin/_mocha -u bdd --recursive --colors test/",
-    "test": "cross-env ENV=development mocha -u bdd --recursive --colors test/"
+    "start": "cross-env NODE_ENV=production node bin//dk-server.js",
+    "coverage": "cross-env NODE_ENV=development LOG_LEVEL=0 nyc --reporter=lcov --reporter=text --clean node node_modules/mocha/bin/_mocha -u bdd --recursive --colors test/",
+    "test": "cross-env NODE_ENV=development LOG_LEVEL=0 mocha -u bdd --recursive --colors test/"
   },
   "author": "",
   "license": "MIT",
   "dependencies": {
     "bcryptjs": "^2.4.3",
     "body-parser": "^1.18.2",
+    "cli-color": "^1.2.0",
+    "compression": "^1.7.2",
     "dockerode": "^2.5.3",
     "es6-error": "^4.1.1",
     "express": "^4.16.2",
@@ -26,7 +29,8 @@
     "slugify": "^1.2.9",
     "statuses": "^1.4.0",
     "swagger-ui-express": "^1.0.8",
-    "tempy": "^0.2.1"
+    "tempy": "^0.2.1",
+    "yargs": "^11.0.0"
   },
   "devDependencies": {
     "chai": "^4.1.2",
