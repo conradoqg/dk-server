@@ -15,7 +15,7 @@
     "dockerode": "^2.5.3",
     "es6-error": "^4.1.1",
     "express": "^4.16.2",
-    "express-async-handler": "^1.0.3",
+    "express-async-errors": "^2.1.2",
     "express-rate-limit": "^2.11.0",
     "goby": "^1.1.2",
     "js-yaml": "^3.10.0",
