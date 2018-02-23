@@ -16,6 +16,7 @@ describe('HTTPServer', async () => {
 
     before(async () => {
         const dockerService = new Docker();
+        await dockerService.connect();
         const dbService = new DB();        
         const authService = new Auth(dbService);
         const stackTemplateService = new StackTemplate(dbService);

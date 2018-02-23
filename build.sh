@@ -19,6 +19,6 @@ else
   mv "${DOWNLOAD_FOLDER}/docker/docker" third/
 fi
 
-docker build . -t dk-server:"${jq .version -r package.json}" $4
+export PATH=$PATH:/dk-server/third
 
 exit 0

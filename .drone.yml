@@ -1,0 +1,7 @@
+pipeline:
+  test:
+    image: node:carbon
+    commands:
+      - npm install
+      - npm run download-dep
+      - npm test

@@ -16,6 +16,10 @@ describe('Docker', () => {
     };
     const context = {};
 
+    step('connect', async () => {
+        await docker.connect();
+    });
+
     step('check if it\'s pinging', async () => {
         const pingResult = await docker.ping();
         pingResult.should.be.true;
