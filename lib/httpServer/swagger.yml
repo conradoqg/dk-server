@@ -354,7 +354,7 @@ paths:
           schema:
             $ref: "#/definitions/UserResponse"
         400:
-          description: BadRequest - The parameter email and/or password must be a string or the password doesn't meet policy criteria or the user already exists
+          description: BadRequest - The parameter name and/or password must be a string or the password doesn't meet policy criteria or the user already exists
           schema:
             $ref: "#/definitions/Error" 
     put:
@@ -384,7 +384,7 @@ paths:
         401:          
           $ref: "#/responses/Unauthorized"
         400:
-          description: BadRequest - The parameter email must be a string or the password doesn't meet policy criteria or the user doesn't exist
+          description: BadRequest - The parameter name must be a string or the password doesn't meet policy criteria or the user doesn't exist
           schema:
             $ref: "#/definitions/Error"
   /token:
@@ -392,7 +392,7 @@ paths:
       tags:
         - tokens
       summary: Create a token
-      description: Create a token using email and password
+      description: Create a token using name and password
       parameters:
         -
           in: body
@@ -402,10 +402,10 @@ paths:
           schema:
             type: object
             required:
-              - email
+              - name
               - password
             properties:
-              email:
+              name:
                 type: string
               password:
                 type: string
@@ -420,7 +420,7 @@ paths:
         401:
           $ref: "#/responses/Unauthorized"              
         400:
-          description: BadRequest - The parameter email and/or password must be a string or invalid username and/or password
+          description: BadRequest - The parameter name and/or password must be a string or invalid username and/or password
           schema:
             $ref: "#/definitions/Error" 
 
@@ -451,7 +451,7 @@ definitions:
         type: string
       image: 
         type: string
-      email: 
+      username: 
         type: string
       ports:
         type: array
@@ -490,25 +490,25 @@ definitions:
   User:
     type: object
     properties:
-      email:
+      name:
         type: string
       password:
         type: string
       type:
         type: string
     required:
-      - email
+      - name
       - password
       - type
   UserResponse:
     type: object
     properties:
-      email:
+      name:
         type: string
       type:
         type: string
     required:
-      - email
+      - name
       - type
   Error:
     type: object

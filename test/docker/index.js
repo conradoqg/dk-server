@@ -12,7 +12,7 @@ const timeout = ms => new Promise(res => setTimeout(res, ms));
 describe('Docker', () => {
     const docker = new Docker();
     const userUser = {
-        email: chance.email({ domain: 'totvs.com.br' }),
+        name: chance.email({ domain: 'totvs.com.br' }),
         type: 'user'
     };
     const context = {};

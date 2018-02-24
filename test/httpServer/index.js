@@ -1,4 +1,4 @@
-require('../index');
+//require('../index');
 require('mocha-steps');
 require('chai').should();
 const supertest = require('supertest');
@@ -27,23 +27,23 @@ describe('HTTPServer', async () => {
         context.dbService = dbService;
         context.initialToken = await authService.getFirstTimeToken();
         context.userInvalid = {
-            email: chance.email({ domain: 'totvs.com.br' }),
+            name: chance.email({ domain: 'totvs.com.br' }),
             password: chance.string({ length: 5 })
         };
         context.userUser1 = {
-            email: chance.email({ domain: 'totvs.com.br' }),
+            name: chance.email({ domain: 'totvs.com.br' }),
             password: chance.string({ length: 6 })
         };
         context.userUser2 = {
-            email: chance.email({ domain: 'totvs.com.br' }),
+            name: chance.email({ domain: 'totvs.com.br' }),
             password: chance.string({ length: 6 })
         };
         context.userUser3 = {
-            email: chance.email({ domain: 'totvs.com.br' }),
+            name: chance.email({ domain: 'totvs.com.br' }),
             password: chance.string({ length: 6 })
         };
         context.userAdmin1 = {
-            email: chance.email({ domain: 'totvs.com.br' }),
+            name: chance.email({ domain: 'totvs.com.br' }),
             password: chance.string({ length: 6 }),
             type: 'admin'
         };
@@ -146,7 +146,7 @@ networks:
     step('get token for an invaid user', async () => {
         await supertest(context.server1.app)
             .post('/token')
-            .send({ email: 'none', password: 'none' })
+            .send({ name: 'none', password: 'none' })
             .expect(401);
     });
 
@@ -172,7 +172,7 @@ networks:
             .put('/users')
             .set({ Authorization: context.tokenUserUser3 })
             .send({
-                email: context.userUser3.email,
+                name: context.userUser3.name,
                 password: newPassword
             })
             .expect(200);
@@ -202,7 +202,7 @@ networks:
             .put('/users/')
             .set({ Authorization: context.tokenUserAdmin1 })
             .send({
-                email: context.userUser3.email,
+                name: context.userUser3.name,
                 type: 'admin'
             })
             .expect(200);
