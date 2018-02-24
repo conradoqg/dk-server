@@ -1,3 +1,4 @@
+require('../index');
 require('mocha-steps');
 require('chai').should();
 const supertest = require('supertest');

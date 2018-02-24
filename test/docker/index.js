@@ -1,3 +1,4 @@
+require('../index');
 require('mocha-steps');
 const chai = require('chai');
 const Docker = require('../../lib/docker');
