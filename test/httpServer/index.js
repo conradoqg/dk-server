@@ -15,11 +15,11 @@ describe('HTTPServer', async () => {
     const context = {};
 
     before(async () => {
-        const dockerService = new Docker();
+        const dbService = new DB();
+        const dockerService = new Docker(2, 'db_stack');
         await dockerService.connect();
-        const dbService = new DB();        
-        const authService = new Auth(dbService);
-        const stackTemplateService = new StackTemplate(dbService);
+        const authService = new Auth(dbService.users);
+        const stackTemplateService = new StackTemplate(dbService.stackTemplates);
         const server = new HTTPServer(dockerService, authService, stackTemplateService);
 
         context.server1 = server;
@@ -142,6 +142,13 @@ networks:
         context.tokenUserUser1 = tokenResponse.body.token;
     });
 
+    step('get token for an invaid user', async () => {
+        await supertest(context.server1.app)
+            .post('/token')
+            .send({ email: 'none', password: 'none' })
+            .expect(401);
+    });
+
     step('get token for user 2', async () => {
         const tokenResponse = await supertest(context.server1.app)
             .post('/token')
@@ -200,6 +207,14 @@ networks:
             .expect(200);
     });
 
+    step('get all users using admin', async () => {
+        const users = await supertest(context.server1.app)
+            .get('/users')
+            .set({ Authorization: context.tokenUserAdmin1 })
+            .expect(200);
+        users.body.should.be.an('array');
+    });
+
     step('get stacks of user 1', async () => {
         const stacksResult = await supertest(context.server1.app)
             .get('/stacks')
@@ -208,7 +223,7 @@ networks:
         stacksResult.body.should.be.an('array').that.is.empty;
     });
 
-    step('create stack template', async () => {
+    step('create stack template using an admin', async () => {
         const stackTemplates = await supertest(context.server1.app)
             .post('/templates/stacks')
             .set({ Authorization: context.tokenUserAdmin1 })
@@ -218,7 +233,7 @@ networks:
         stackTemplates.body.should.be.a('object').that.has.property('data', context.sampleStackTemplate);
     });
 
-    step('create stack template (duplicate)', async () => {
+    step('create stack template using admin (duplicate)', async () => {
         await supertest(context.server1.app)
             .post('/templates/stacks')
             .set({ Authorization: context.tokenUserAdmin1 })
@@ -226,7 +241,23 @@ networks:
             .expect(400);
     });
 
-    step('update stack template', async () => {
+    step('create stack template using an user', async () => {
+        await supertest(context.server1.app)
+            .post('/templates/stacks')
+            .set({ Authorization: context.tokenUserUser1 })
+            .send({ stackTemplateName: 'docker-stack-sample1', stackTemplateData: context.sampleStackTemplate })
+            .expect(403);
+    });
+
+    step('get a stack template using an admin', async () => {
+        const stackTemplate = await supertest(context.server1.app)
+            .get('/templates/stacks/docker-stack-sample1')
+            .set({ Authorization: context.tokenUserAdmin1 })
+            .expect(200);
+        stackTemplate.body.should.be.an('object').that.has.property('name', 'docker-stack-sample1');
+    });
+
+    step('update stack template using an admin', async () => {
         const stackTemplates = await supertest(context.server1.app)
             .put('/templates/stacks')
             .set({ Authorization: context.tokenUserAdmin1 })
@@ -234,6 +265,14 @@ networks:
             .expect(200);
         stackTemplates.body.should.be.a('object').that.has.property('name', 'docker-stack-sample1');
         stackTemplates.body.should.be.a('object').that.has.property('data', context.sampleStackTemplate);
+    });
+
+    step('update stack template using an user', async () => {
+        await supertest(context.server1.app)
+            .put('/templates/stacks')
+            .set({ Authorization: context.tokenUserUser1 })
+            .send({ stackTemplateName: 'docker-stack-sample1', stackTemplateData: context.sampleStackTemplate })
+            .expect(403);
     });
 
     step('create stack 1 for user 1', async () => {
@@ -308,6 +347,20 @@ networks:
             .set({ Authorization: context.tokenUserUser1 })
             .expect(200);
         stackResult.body.should.not.be.empty;
+    });
+
+    step('delete stack template using an user', async () => {
+        await supertest(context.server1.app)
+            .delete('/templates/stacks/docker-stack-sample1')
+            .set({ Authorization: context.tokenUserUser1 })
+            .expect(403);
+    });
+
+    step('delete stack template using an admin', async () => {
+        await supertest(context.server1.app)
+            .delete('/templates/stacks/docker-stack-sample1')
+            .set({ Authorization: context.tokenUserAdmin1 })
+            .expect(200);
     });
 
     step('try to create a invalid stack for user 1', async () => {

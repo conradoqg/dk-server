@@ -26,7 +26,7 @@ describe('Docker', () => {
     });
 
     step('create a stack for an user', async () => {
-        const stackName = await docker.createStack(userUser, path.join(__dirname, 'docker-stack-sample1.yml'));
+        const stackName = await docker.createStackByTemplatePath(userUser, path.join(__dirname, 'docker-stack-sample1.yml'));
         should.exist(stackName);
         context.stack1 = { name: stackName };
         await timeout(5000);
