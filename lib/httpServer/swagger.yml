@@ -41,6 +41,8 @@ paths:
           description: OK
           schema:
             type: string
+        429:
+          $ref: "#/responses/TooManyRequests"   
   /healthcheck:
     get:
       tags:
@@ -55,6 +57,8 @@ paths:
             properties:
               healthy:
                 type: boolean
+        429:
+          $ref: "#/responses/TooManyRequests"   
   /stacks:
     get:
       tags:
@@ -70,6 +74,8 @@ paths:
             type: array
             items:
               $ref: "#/definitions/Stack"
+        429:
+          $ref: "#/responses/TooManyRequests"   
         401:          
           $ref: "#/responses/Unauthorized"
     post:
@@ -102,10 +108,12 @@ paths:
             properties:
               stackName:
                 type: string
+        429:
+          $ref: "#/responses/TooManyRequests"   
         401:          
           $ref: "#/responses/Unauthorized"
         400:
-          description: BadRequest - Stack template not found or max stacks for user reached
+          description: BadRequest - Stack template not found or max stacks for user reached or invalid JSON body
           schema:
             $ref: "#/definitions/Error"        
   /stacks/{stackName}:
@@ -128,6 +136,8 @@ paths:
           description: OK
           schema:
             $ref: "#/definitions/Stack"
+        429:
+          $ref: "#/responses/TooManyRequests"   
         404:
           description: Not Found - Stack not found for user
           schema:
@@ -159,7 +169,9 @@ paths:
             type: object
             properties:
               success:
-                type: boolean            
+                type: boolean   
+        429:
+          $ref: "#/responses/TooManyRequests"            
         404:
           description: Not Found - Stack not found for user
           schema:
@@ -185,6 +197,8 @@ paths:
             type: array
             items:
               $ref: "#/definitions/StackTemplate"
+        429:
+          $ref: "#/responses/TooManyRequests"   
         401:          
           $ref: "#/responses/Unauthorized"
     post:
@@ -207,6 +221,8 @@ paths:
           description: OK
           schema:
             $ref: "#/definitions/StackTemplate"
+        429:
+          $ref: "#/responses/TooManyRequests"   
         403:
           description: Forbidden - The user is not authorized to do this operation
           schema:
@@ -214,7 +230,7 @@ paths:
         401:          
           $ref: "#/responses/Unauthorized"
         400:
-          description: BadRequest - Template already exist
+          description: BadRequest - Template already exist or invalid JSON body
           schema:
             $ref: "#/definitions/Error" 
     put:
@@ -237,6 +253,8 @@ paths:
           description: OK
           schema:
             $ref: "#/definitions/StackTemplate"
+        429:
+          $ref: "#/responses/TooManyRequests"   
         403:
           description: Forbidden - The user is not authorized to do this operation
           schema:
@@ -244,7 +262,7 @@ paths:
         401:          
           $ref: "#/responses/Unauthorized"
         400:
-          description: BadRequest - Template already exist
+          description: BadRequest - Template already exist or invalid JSON body
           schema:
             $ref: "#/definitions/Error" 
   /templates/stacks/{stackTemplateName}:
@@ -267,6 +285,8 @@ paths:
           description: OK
           schema:
             $ref: "#/definitions/StackTemplate"
+        429:
+          $ref: "#/responses/TooManyRequests"   
         404:
           description: Not Found - Stack template not found
           schema:
@@ -300,6 +320,8 @@ paths:
           description: OK
           schema:
             $ref: "#/definitions/StackTemplate"
+        429:
+          $ref: "#/responses/TooManyRequests"   
         404:
           description: Not Found - Stack template not found
           schema:
@@ -309,7 +331,7 @@ paths:
           schema:
             $ref: "#/definitions/Error" 
         401:          
-          $ref: "#/responses/Unauthorized"
+          $ref: "#/responses/Unauthorized"        
         400:
           description: Bad Request - The stackTemplateName parameter must be a string
           schema:
@@ -329,6 +351,8 @@ paths:
               type: array
               items:
                 $ref: "#/definitions/UserResponse"
+        429:
+          $ref: "#/responses/TooManyRequests"   
         403:
             description: Forbidden - The user is not authorized to list users
             schema:
@@ -353,8 +377,10 @@ paths:
           description: OK
           schema:
             $ref: "#/definitions/UserResponse"
+        429:
+          $ref: "#/responses/TooManyRequests"   
         400:
-          description: BadRequest - The parameter name and/or password must be a string or the password doesn't meet policy criteria or the user already exists
+          description: BadRequest - The parameter name and/or password must be a string or the password doesn't meet policy criteria or the user already exists or invalid JSON body
           schema:
             $ref: "#/definitions/Error" 
     put:
@@ -377,6 +403,8 @@ paths:
           description: OK
           schema:
             $ref: "#/definitions/UserResponse"
+        429:
+          $ref: "#/responses/TooManyRequests"   
         403:
           description: Forbidden - The user is not authorized to update user
           schema:
@@ -384,7 +412,7 @@ paths:
         401:          
           $ref: "#/responses/Unauthorized"
         400:
-          description: BadRequest - The parameter name must be a string or the password doesn't meet policy criteria or the user doesn't exist
+          description: BadRequest - The parameter name must be a string or the password doesn't meet policy criteria or the user doesn't exist or invalid JSON body
           schema:
             $ref: "#/definitions/Error"
   /token:
@@ -417,18 +445,77 @@ paths:
             properties:
               token:
                 type: string  
+        429:
+          $ref: "#/responses/TooManyRequests"   
         401:
           $ref: "#/responses/Unauthorized"              
         400:
-          description: BadRequest - The parameter name and/or password must be a string or invalid username and/or password
+          description: BadRequest - The parameter name and/or password must be a string or invalid username and/or password or invalid JSON body
           schema:
-            $ref: "#/definitions/Error" 
+            $ref: "#/definitions/Error"
+  /admin/config:
+    get:
+      tags:
+        - admin
+      summary: Get the configuration
+      description: Get the configuration
+      security:
+        - JWTAuthorization: []
+      responses:
+        200:
+          description: OK
+          schema:
+            $ref: "#/definitions/Configuration"
+        429:
+          $ref: "#/responses/TooManyRequests"   
+        403:
+          description: Forbidden - The user is not authorized to do this operation
+          schema:
+            $ref: "#/definitions/Error"   
+        401:
+          $ref: "#/responses/Unauthorized"             
+    put:
+      tags:
+        - admin
+      summary: Update configuration
+      description: Update configuration
+      security:
+        - JWTAuthorization: []
+      parameters:
+        -
+          in: body
+          name: body
+          description: Configuration
+          required: true,
+          schema:
+            $ref: "#/definitions/Configuration"
+      responses:
+        200:
+          description: OK
+          schema:
+            $ref: "#/definitions/Configuration"
+        429:
+          $ref: "#/responses/TooManyRequests"   
+        403:
+          description: Forbidden - The user is not authorized to do this operation
+          schema:
+            $ref: "#/definitions/Error"   
+        401:
+          $ref: "#/responses/Unauthorized"   
+        400:
+          description: BadRequest - Invalid JSON body
+          schema:
+            $ref: "#/definitions/Error"
 
 responses:
   Unauthorized:
     description: Unauthorized - Authorization header missing or failed to authenticate token
     schema:
-      $ref: "#/definitions/Error"  
+      $ref: "#/definitions/Error"
+  TooManyRequests: 
+    description: Too Many Requests - Too many requests, please try again after x time
+    schema:
+      $ref: "#/definitions/Error"
 
 definitions:
   Stack:
@@ -510,6 +597,36 @@ definitions:
     required:
       - name
       - type
+  Configuration:
+    type: object
+    properties:
+      maxStacksPerUser:
+        type: integer
+        default: 2
+      serviceType:
+        type: string
+        default: dk_stack
+      ldap:
+        type: object
+        properties: 
+          url:
+            type: string
+            example: ldap://ldap.forumsys.com:389
+          bindDN:
+            type: string
+            example: cn=read-only-admin,dc=example,dc=com
+          bindCredentials:
+            type: string
+            example: password
+          searchBase:
+            type: string
+            example: dc=example,dc=com
+          searchFilter:
+            type: string  
+            example: (uid={{username}})      
+    required:
+      - maxStacksPerUser
+      - serviceType
   Error:
     type: object
     properties:
