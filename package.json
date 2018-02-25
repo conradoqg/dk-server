@@ -27,7 +27,7 @@
     "helmet": "^3.11.0",
     "js-yaml": "^3.10.0",
     "jsonwebtoken": "^8.1.1",
-    "ldapauth-fork": "^4.0.2",    
+    "ldapauth-fork": "^4.0.2",
     "password-sheriff": "^1.1.0",
     "pouchdb": "^6.4.3",
     "pug": "^2.0.0-rc.4",
