@@ -506,6 +506,29 @@ paths:
           description: BadRequest - Invalid JSON body
           schema:
             $ref: "#/definitions/Error"
+  /admin/metrics:
+    get:
+      tags:
+        - admin
+      summary: Get all metrics
+      description: Get all metrics for the current session
+      security:
+        - JWTAuthorization: []
+      responses:
+        200:
+          description: OK  
+        429:
+          $ref: "#/responses/TooManyRequests"
+        403:
+            description: Forbidden - The user is not authorized to do this operation
+            schema:
+              $ref: "#/definitions/Error"
+        401:
+          $ref: "#/responses/Unauthorized"   
+        400:
+          description: BadRequest - Invalid JSON body
+          schema:
+            $ref: "#/definitions/Error"           
 
 responses:
   Unauthorized:
