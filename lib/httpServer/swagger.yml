@@ -2,16 +2,24 @@ swagger: "2.0"
 info:
   title: DK API
   description: |
-    <h2>Authentication</h2><br>
+    <h2>Getting started</h2>    
     <ul>
-      <li>Create an user: POST to /users</li>
-      <li>Create a token using the previously created user: POST to /token</li>
+      <li>Create an admin user using the initial token from console: POST to /users</li>
+      <li>Create a token using the previously created user: POST to /tokens</li>
+      <li>Create a stack template: POST to /templates/stacks</li>
+      <li>Create a stack using the template name: POST to /stacks</li>
     </ul><br>
-    <h2>Rate Limit</h2><br>
+    <h2>Rate Limit</h2>
     The resources have a limited amount of requests as following:
     <ul>
       <li> All endpoints: 15 minutes window for 100 requests </li>
       <li> User creation: 1 day window for 2 requests </li>
+    </ul><br>
+    <h2>User types</h2>
+    There are two types of users:
+    <ul>
+      <li> User: Can create and delete its own stack</li>
+      <li> Admin: Can do everything else </li>
     </ul>
   version: 1.0.0
 
@@ -34,7 +42,7 @@ paths:
     get:
       tags:
         - general    
-      summary: Get ping response
+      summary: Get a ping response
       description: Check if the API is responding to requests.
       responses:
         200:
@@ -47,7 +55,7 @@ paths:
     get:
       tags:
         - general    
-      summary: Get healthcheck information
+      summary: Get the healthcheck information
       description: Check if the API is healthy, meaning that it can talk to database and docker.
       responses:
         200:
@@ -64,7 +72,7 @@ paths:
       tags:
         - stacks
       summary: Get stacks
-      description: All running stacks are returned
+      description: All running stacks from an user or all for admins.
       security:
         - JWTAuthorization: []
       responses:
@@ -82,7 +90,10 @@ paths:
       tags:
         - stacks
       summary: Create a stack
-      description: Create a stack using a stack template name
+      description: |
+        Create a stack using a stack template name. 
+        Users have a limited amount of stacks that they can run and can only use pre-defined templates.
+        Admins does not have a limitation and can start a stack from a template directly.
       security:
         - JWTAuthorization: []
       parameters:
@@ -100,6 +111,9 @@ paths:
                 type: string
               stackName:
                 type: string
+              stackTemplateData:
+                type: string
+                description: A template can be send directly by an admin instead of a pre-defined stack template.
       responses:
         200:
           description: OK
@@ -121,7 +135,7 @@ paths:
       tags:
         - stacks
       summary: Get a stack
-      description: Get a stack by name
+      description: Get a runnig stack by name from a user or all for admins.
       security:
         - JWTAuthorization: []
       parameters:
@@ -152,7 +166,7 @@ paths:
       tags:
         - stacks
       summary: Delete a stack
-      description: Delete a stack by name
+      description: Delete a running stack by name from a user or any for admins.
       security:
         - JWTAuthorization: []
       parameters:
@@ -187,7 +201,7 @@ paths:
       tags:
         - stack templates
       summary: Get stack templates
-      description: All existing stack templates are returned
+      description: All existing stack templates are returned. Only for admins.
       security:
         - JWTAuthorization: []
       responses:
@@ -205,7 +219,7 @@ paths:
       tags:
         - stack templates
       summary: Create a stack template
-      description: Create a stack template from a yaml file  
+      description: Create a stack template from a yaml file. Only for admins.
       security:
         - JWTAuthorization: []    
       parameters:
@@ -237,7 +251,7 @@ paths:
       tags:
         - stack templates
       summary: Update a stack template
-      description: Update a stack template from a yaml file using the stack template name
+      description: Update a stack template from a yaml file using the stack template name. Only for admins.
       security:
         - JWTAuthorization: []
       parameters:
@@ -270,7 +284,7 @@ paths:
       tags:
         - stack templates
       summary: Get a stack template
-      description: Get a stack template by name
+      description: Get a stack template by name. Only for admins.
       security:
         - JWTAuthorization: []
       parameters:
@@ -305,7 +319,7 @@ paths:
       tags:
         - stack templates
       summary: Delete a stack template
-      description: Delete a stack template by name
+      description: Delete a stack template by name. Only for admins.
       security:
         - JWTAuthorization: []
       parameters:
@@ -341,7 +355,7 @@ paths:
       tags:
         - users
       summary: Get users
-      description: Get all users
+      description: Get all users. Only for admins.
       security:
         - JWTAuthorization: []
       responses:
@@ -387,7 +401,7 @@ paths:
       tags:
         - users
       summary: Update a user
-      description: Update a user password or type
+      description: Update a user password or type. User can only update its user password and admins can update the type of an user.
       security:
         - JWTAuthorization: []
       parameters:
@@ -415,12 +429,12 @@ paths:
           description: BadRequest - The parameter name must be a string or the password doesn't meet policy criteria or the user doesn't exist or invalid JSON body
           schema:
             $ref: "#/definitions/Error"
-  /token:
+  /tokens:
     post:
       tags:
         - tokens
       summary: Create a token
-      description: Create a token using name and password
+      description: Create a token using name and password. If LDAP is activated, it tries to authenticate against it. It's not necessary to create an user to use LDAP authentication.
       parameters:
         -
           in: body
@@ -458,7 +472,7 @@ paths:
       tags:
         - admin
       summary: Get the configuration
-      description: Get the configuration
+      description: Get the configuration. Only for admins.
       security:
         - JWTAuthorization: []
       responses:
@@ -478,7 +492,7 @@ paths:
       tags:
         - admin
       summary: Update configuration
-      description: Update configuration
+      description: Update configuration. Only for admins.
       security:
         - JWTAuthorization: []
       parameters:
@@ -510,8 +524,8 @@ paths:
     get:
       tags:
         - admin
-      summary: Get all metrics
-      description: Get all metrics for the current session
+      summary: Get metrics
+      description: Get all metrics for the current running session. Only for admins.
       security:
         - JWTAuthorization: []
       responses:

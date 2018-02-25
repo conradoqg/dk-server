@@ -141,7 +141,7 @@ networks:
 
     step('get token for user 1', async () => {
         const tokenResponse = await supertest(context.server1.app)
-            .post('/token')
+            .post('/tokens')
             .send(context.userUser1)
             .expect(200);
         context.tokenUserUser1 = tokenResponse.body.token;
@@ -149,14 +149,14 @@ networks:
 
     step('get token for an invaid user', async () => {
         await supertest(context.server1.app)
-            .post('/token')
+            .post('/tokens')
             .send({ name: 'none', password: 'none' })
             .expect(401);
     });
 
     step('get token for user 2', async () => {
         const tokenResponse = await supertest(context.server1.app)
-            .post('/token')
+            .post('/tokens')
             .send(context.userUser2)
             .expect(200);
         context.tokenUserUser2 = tokenResponse.body.token;
@@ -164,7 +164,7 @@ networks:
 
     step('get token for user 3', async () => {
         const tokenResponse = await supertest(context.server1.app)
-            .post('/token')
+            .post('/tokens')
             .send(context.userUser3)
             .expect(200);
         context.tokenUserUser3 = tokenResponse.body.token;
@@ -186,7 +186,7 @@ networks:
 
     step('get token for user 3 with the new password', async () => {
         const tokenResponse = await supertest(context.server1.app)
-            .post('/token')
+            .post('/tokens')
             .send(context.userUser3)
             .expect(200);
         context.tokenUserUser3 = tokenResponse.body.token;
@@ -194,7 +194,7 @@ networks:
 
     step('get token for user admin 1', async () => {
         const tokenResponse = await supertest(context.server1.app)
-            .post('/token')
+            .post('/tokens')
             .set({ Authorization: context.initialToken })
             .send(context.userAdmin1)
             .expect(200);
