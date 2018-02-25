@@ -29,6 +29,7 @@ describe('HTTPServer', async () => {
 
         context.server1 = server;
         context.dbService = dbService;
+        context.authService = authService;
         context.initialToken = await authService.getFirstTimeToken();
         context.userInvalid = {
             name: chance.email({ domain: 'totvs.com.br' }),
@@ -50,6 +51,10 @@ describe('HTTPServer', async () => {
             name: chance.email({ domain: 'totvs.com.br' }),
             password: chance.string({ length: 6 }),
             type: 'admin'
+        };
+        context.userLDAPUser1 = {
+            name: 'riemann',
+            password: 'password'
         };
         context.sampleStackTemplate =
             `version: '3'
@@ -382,6 +387,48 @@ networks:
             .set({ Authorization: context.tokenUserUser1 })
             .expect(200);
         stackTemplates.body.should.be.an('array');
+    });
+
+    step('get config using an user', async () => {
+        await supertest(context.server1.app)
+            .get('/admin/config')
+            .set({ Authorization: context.tokenUserUser1 })
+            .expect(403);
+    });
+
+    step('get config using an admin', async () => {
+        const configResponse = await supertest(context.server1.app)
+            .get('/admin/config')
+            .set({ Authorization: context.tokenUserAdmin1 })
+            .expect(200);
+        configResponse.body.should.be.an('object');
+        context.config = configResponse.body;
+    });
+
+    step('update config adding ldap', async () => {
+        context.config.ldap = {
+            url: 'ldap://ldap.forumsys.com:389',
+            bindDN: 'cn=read-only-admin,dc=example,dc=com',
+            bindCredentials: 'password',
+            searchBase: 'dc=example,dc=com',
+            searchFilter: '(uid={{username}})'
+        };
+        const configResponse = await supertest(context.server1.app)
+            .put('/admin/config')
+            .set({ Authorization: context.tokenUserAdmin1 })
+            .send(context.config)
+            .expect(200);
+        configResponse.body.should.be.an('object');
+        context.config = configResponse.body;
+        context.authService.ldapConfig = context.config.ldap;
+    });
+
+    step('get token for ldap user 1', async () => {
+        const tokenResponse = await supertest(context.server1.app)
+            .post('/tokens')
+            .send(context.userLDAPUser1)
+            .expect(200);
+        context.tokenUserLDAPUser1 = tokenResponse.body.token;
     });
 
     after(async () => {
