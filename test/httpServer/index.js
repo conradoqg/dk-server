@@ -8,6 +8,8 @@ const StackTemplate = require('../../lib/template/stackTemplate');
 const Docker = require('../../lib/docker');
 const DB = require('../../lib/db');
 const Auth = require('../../lib/auth');
+const Config = require('../../lib/config');
+const Metric = require('../../lib/metric');
 
 const chance = new Chance();
 const timeout = ms => new Promise(res => setTimeout(res, ms));
@@ -21,7 +23,9 @@ describe('HTTPServer', async () => {
         await dockerService.connect();
         const authService = new Auth(dbService.users);
         const stackTemplateService = new StackTemplate(dbService.stackTemplates);
-        const server = new HTTPServer(dockerService, authService, stackTemplateService);
+        const configService = new Config(dbService.config);
+        const metricService = new Metric();
+        const server = new HTTPServer(dockerService, authService, stackTemplateService, configService, metricService);
 
         context.server1 = server;
         context.dbService = dbService;
