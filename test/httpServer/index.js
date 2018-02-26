@@ -298,6 +298,21 @@ networks:
         context.stack1 = stackCreationResult.body.stackName;
     });
 
+    step('get service log from stack of user 1', async () => {
+        const stackResult = await supertest(context.server1.app)
+            .get(`/stacks/${context.stack1}`)
+            .set({ Authorization: context.tokenUserUser1 })
+            .expect(200);
+        stackResult.body.should.be.an('object').that.is.not.empty;
+        stackResult.body.services.should.be.an('array');
+        const firstServiceID = stackResult.body.services[0].id;
+        const logResult = await supertest(context.server1.app)
+            .get(`/stacks/${context.stack1}/services/${firstServiceID}/logs`)
+            .set({ Authorization: context.tokenUserUser1 })
+            .expect(200);
+        logResult.body.should.be.a('string');
+    });
+
     step('create stack 2 for user 1', async () => {
         const stackCreationResult = await supertest(context.server1.app)
             .post('/stacks')

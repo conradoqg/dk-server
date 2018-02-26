@@ -18,7 +18,7 @@
     "body-parser": "^1.18.2",
     "cli-color": "^1.2.0",
     "compression": "^1.7.2",
-    "dockerode": "^2.5.3",
+    "dockerode": "git+https://github.com/conradoqg/dockerode.git",
     "es6-error": "^4.1.1",
     "express": "^4.16.2",
     "express-async-errors": "^2.1.2",
@@ -46,7 +46,7 @@
     "cross-env": "^5.1.3",
     "mocha": "^5.0.1",
     "mocha-steps": "git+https://github.com/rprieto/mocha-steps.git",
-    "nyc": "^11.4.1",
+    "nyc": "^11.5.0",
     "supertest": "^3.0.0"
   },
   "engines": {

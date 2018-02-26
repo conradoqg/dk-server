@@ -195,7 +195,45 @@ paths:
         400:
           description: Bad Request - The stackName parameter must be a string
           schema:
-            $ref: "#/definitions/Error"        
+            $ref: "#/definitions/Error"  
+  /stacks/{stackName}/services/{serviceID}/logs:      
+    get:
+      tags:
+        - stacks
+      summary: Get the log of a service of a stack
+      description: Get the log of a service of a stack from a user or all for admins.
+      security:
+        - JWTAuthorization: []
+      parameters:
+        -
+          in: path
+          name: stackName
+          description: Stack name
+          required: true,
+          type: string
+        -
+          in: path
+          name: serviceID
+          description: Service ID
+          required: true,
+          type: string
+      responses:
+        200:
+          description: OK
+          schema:
+            type: string
+        429:
+          $ref: "#/responses/TooManyRequests"   
+        404:
+          description: Not Found - Stack not found for user
+          schema:
+            $ref: "#/definitions/Error"
+        401:          
+          $ref: "#/responses/Unauthorized"
+        400:
+          description: Bad Request - The stackName parameter must be a string or The serviceID parameter must be a string
+          schema:
+            $ref: "#/definitions/Error"
   /templates/stacks:
     get:
       tags:
