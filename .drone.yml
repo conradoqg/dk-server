@@ -1,7 +1,9 @@
 pipeline:
   test:
-    image: node:carbon
+    image: docker:dind
+    privileged: true
     commands:
-      - npm install
+      - apk add --no-cache --update nodejs
+      - npm install 
       - npm run download-dep
       - npm test
